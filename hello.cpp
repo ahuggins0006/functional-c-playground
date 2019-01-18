@@ -24,6 +24,22 @@ Collection map(Collection col, unop op) {
   return col;
 }
 
+//FilterNot
+//This removes all the elements which satisfies the predicate.
+template <typename Collection, typename Predicate>
+Collection filterNot(Collection col, Predicate predicate) {
+  auto returnIterator = std::remove_if(col.begin(),col.end(),predicate);
+  col.erase(returnIterator, std::end(col));
+  return col;
+}
+template <typename Collection, typename Predicate>
+Collection filter(Collection col, Predicate predicate) {
+  //capture the predicate in order to be sued inside function
+  auto fnCol = filterNot(col, [predicate](typename Collection::value_type i) {
+                                return !predicate(i);
+                              });
+  return fnCol;
+}
 //LISP
 template <int ...>
 struct mySum;
@@ -38,6 +54,8 @@ struct mySum<head, tail...>{
   static const int value = head + mySum<tail...>::value;
 };
 
+
+
 main() {
   int retLambda = fxsquare(100);
 
@@ -49,12 +67,16 @@ main() {
   //for_each(col, lambda_echo);
 
   auto addOne = [](int i) {return i+1;};
-  auto returnCol = map(col, addOne);
-  //for_each(returnCol, lambda_echo);
+  auto square = [](int i) {return i*i;};
+  auto returnCol = map(col, square);
+  for_each(returnCol, lambda_echo);
 
 
   int sum = mySum<1,2,3>::value;
-  cout << sum <<endl;
+  //cout << sum <<endl;
+
+  auto filteredCol = filter(col, [](int value){return value % 5 == 0;});
+  //for_each(filteredCol, lambda_echo);
 
 }
 
